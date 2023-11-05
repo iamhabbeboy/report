@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TCN Attendance Report</title>
+  </head>
+  <body>
+    <div class="layout">
+      <h1>TCN Attendance Report</h1>
+      <button class="button" id="btn-navigation">Preview</button>
+      <div id="form-layout" style="display:block">
+        <div id="notify" class="notify"></div>
+        <div id="service">
+          <div class="collapse-summary-show">
+            <p></p>
+            <h4>Main Auditorium</h4>
+            <label>Service</label>
+            <select class="form-input" id="service-form">
+              <option value="">Select service</option>
+              <option value="1">First service</option>
+              <option value="2">Second service</option>
+            </select>
+            <a href="#" class="text-small" id="find-service" style="text-decoration:underline">Find</a>
+            <p></p>
+            <label>Adult</label>
+            <input
+              type="number"
+              class="form-input"
+              value="0"
+              data-id="main-adult"
+            />
+            <p></p>
+            <label>Baby</label>
+            <input
+              type="number"
+              class="form-input"
+              value="0"
+              data-id="main-baby"
+            />
+            <h4>Extension</h4>
+            <label data-id="extension-adult">Adult</label>
+            <input type="number" class="form-input" value="0" />
+            <p></p>
+            <label>Baby</label>
+            <input
+              type="number"
+              class="form-input"
+              value="0"
+              data-id="extension-baby"
+            />
+            <h4>Overflow</h4>
+            <label>Adult</label>
+            <input
+              type="number"
+              class="form-input"
+              value="0"
+              data-id="overflow-adult"
+            />
+            <p></p>
+            <label>Baby</label>
+            <input
+              type="number"
+              class="form-input"
+              value="0"
+              data-id="overflow-baby"
+            />
+            <h4>Children</h4>
+            <label>Teacher</label>
+            <input
+              type="number"
+              class="form-input"
+              value="0"
+              data-id="children-adult"
+            />
+            <p></p>
+            <label>Children</label>
+            <input
+              type="number"
+              class="form-input"
+              value="0"
+              data-id="children-children"
+            />
+            <h4>Teens</h4>
+            <label>Teacher</label>
+            <input
+              type="number"
+              class="form-input"
+              value="0"
+              data-id="teens-adult"
+            />
+            <p></p>
+            <label>Teen</label>
+            <input
+              type="number"
+              class="form-input"
+              value="0"
+              data-id="teens-children"
+            />
+            <h4>Others</h4>
+            <label>Traffic</label>
+            <input
+              type="number"
+              class="form-input"
+              value="0"
+              data-id="other-traffic"
+            />
+            <p></p>
+            <label>Info Desk</label>
+            <input
+              type="number"
+              class="form-input"
+              value="0"
+              data-id="other-info_desk"
+            />
+            <h4>Offering</h4>
+            <input type="text" class="form-input" value="0" id="offering" />
+            <p></p>
+            <button class="button button__size button__misc" id="form-button">
+              Submit
+            </button>
+            <br />
+            <br />
+          </div>
+        </div>
+      </div>
+      <div id="preview-layout" class="collapse-summary-hide">
+        <h5 class="date">Date: <span id="date">N/A</span></h5>
+      <div class="collapsible">
+        <div class="collapse-summary"> Report summary(in-details)</div>
+        <div class="collapse-summary-show">
+          <button class="btn text-small float-right" >
+            <img src="public/copy-icon.svg" width="10" height="10" /> Copy
+          </button>
+          <p style="clear:both"></p>
+        <div id="service-board"></div>
+        </div>
+      </div>
+      <div>
+          <div class="collapse-summary"> Report Summary</div>
+            <div class="collapse-summary-hide">
+          <button class="btn text-small float-right" id="copy-to-clipboard">
+            <img src="public/copy-icon.svg" width="10" height="10" /> Copy
+          </button>
+          <p style="clear:both"></p>
+          <div id="summary">
+            </div>
+              <div class="block">
+                <p class="title">Grand Total Attendance: <span id="total-attendance">0</span></p>
+              </div>
+          </div>
+          <p></p>
+        <div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
