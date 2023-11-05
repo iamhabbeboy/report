@@ -110,6 +110,12 @@ export function setupReport(element: HTMLButtonElement) {
     "click",
     async () => await copyToClipboard()
   );
+  // copyToClipboardInDetails
+  const clipboardInDetails = document.getElementById("copy-to-clipboard-in-details") as HTMLElement;
+  clipboardInDetails.addEventListener(
+    "click",
+    async () => await copyToClipboardInDetails()
+  );
 
   const navigation = document.getElementById("btn-navigation") as HTMLElement;
   navigation.addEventListener("click", async (event) => {
@@ -173,10 +179,11 @@ async function fetchRecordForInDetails() {
     const totalAdult = await getTotalAdult(record);
     const totalChildrenAndBaby = await getTotalChildrenAndBaby(record);
     const total = await getTotalAttendance(record);
+    const services =  getService(Number(record?.service))
     let elem = `
   <div>
   <div class="collapse">
-    <h5>Service: First</h5>
+    <h5>Service: ${services}</h5>
   </div>
   <div class="block">
     <p class="title">Adult</p>
@@ -273,7 +280,7 @@ async function getTotalChildrenAndBaby(record: IReport | undefined) {
 
 async function getTotalAttendance(record: IReport | undefined) {
   return (
-    (await getTotalChildrenAndBaby(record)) + (await getTotalAdult(record))
+    (await getTotalChildrenAndBaby(record)) + (await getTotalAdult(record)) + Number(record?.teens.children)
   );
 }
 
@@ -296,15 +303,15 @@ async function copyToClipboard() {
   if(records.length === 0) {
     return alert("Unable to Copy: No Report Found");
   }
-   output = "Attendance Stats for Abule-Egba Centre \n ----------------------------------";
+   output = "Attendance Stats for Abule-Egba Centre \n ----------------------------------\n";
+   output += `*Date: ${formattedDate}*`
   for (let record of records) {
     const totalAdult = await getTotalAdult(record);
     const totalBaby = await getTotalChildrenAndBaby(record);
     const total = await getTotalAttendance(record);
-    grandTotalAttendance += total;
+    // grandTotalAttendance += total;
     const service = getService(Number(record?.service));
     const elem = `
-  Date: ${formattedDate}
 Service: 1st & 2nd Services
 ${service} Service
 Total Children & babies: ${totalBaby}
@@ -317,10 +324,58 @@ Total attendance = ${total}
   output += elem
   }
   output += `
-  Grand Total for the ${records.length} services; \n
-Grand Total = ${grandTotalAttendance}
+Grand Total for the ${records.length} services; \n
+*Grand Total = ${grandTotalAttendance}*
   `
+  await navigator.clipboard.writeText(output);
+  return alert("Copied to clipboard.")
+}
 
+
+async function copyToClipboardInDetails() {
+  let records = await db.reports.bulkGet([1, 2]) as IReport[];
+  records = records.filter(record => record !== undefined);
+  const date = new Date();
+  const formattedDate = formatDate(date);
+  let output = "";
+  if(records.length === 0) {
+    return alert("Unable to Copy: No Report Found");
+  }
+   output = "Attendance Stats Analysis \n ----------------------------------\n";
+   output += `*Date: ${formattedDate}*`
+  for (let record of records) {
+    const totalAdult = await getTotalAdult(record);
+    const totalBaby = await getTotalChildrenAndBaby(record);
+    const total = await getTotalAttendance(record);
+    const service = getService(Number(record?.service));
+    const elem = `
+Service: 1st & 2nd Services
+Service: ${service}
+*Adult*\n
+Main: ${record?.main.adult}
+Extension: ${record?.extension.adult}
+Overflow/Cinema: ${record?.overflow.adult}
+Traffic: ${record?.other.traffic}
+Info desk: ${record?.other.info_desk}
+Teen teacher: ${record?.teens.adult}
+Children teacher: ${record?.children.adult}
+*Total: ${totalAdult}*
+-------------------------------------------------
+*Baby & Children*
+Main(Baby): ${record?.main.baby}
+Extension(Baby): ${record?.extension.baby}
+Overflow/Cinema(Baby): ${record?.overflow.baby}
+Chidren: ${record?.children.children}
+*Total: ${totalBaby}*
+-------------------------------------------------
+*Teens:* ${record?.teens.children}
+-------------------------------------------------
+*Total Attendance: ${total}*
+-------------------------------------------------
+*Offering: ${getMoneyFormat(Number(record?.offering)).replace('&#8358;', '₦')}*
+  `;
+  output += elem
+  }
   await navigator.clipboard.writeText(output);
   return alert("Copied to clipboard.")
 }
