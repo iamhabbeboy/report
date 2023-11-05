@@ -179,6 +179,10 @@ h5 {
   font-weight: 600;
 }
 
+.collapse-summary:hover {
+  cursor: pointer;
+}
+
 .block .title {
   font-weight: bold;
 }

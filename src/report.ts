@@ -72,7 +72,7 @@ export function setupReport(element: HTMLButtonElement) {
       notify.innerText = "Service added successfully";
     }
     alert("Service has been added.");
-    return false;
+    window.location.reload();
   };
 
   const getService = async () => {
@@ -166,6 +166,9 @@ function getMoneyFormat(amount: number) {
 async function fetchRecordForInDetails() {
   let records = await getRecords();
   let result = "";
+  if(records.length === 0) {
+    result = "<p style='text-align:center'>No report available!</p>";
+  }
   for (let record of records) {
     const totalAdult = await getTotalAdult(record);
     const totalChildrenAndBaby = await getTotalChildrenAndBaby(record);
@@ -222,6 +225,9 @@ let grandTotalAttendance = 0;
 async function fetchAllRecordOnDisplay() {
   let records = await getRecords();
   let result = "";
+  if(records.length === 0) {
+    result = "<p style='text-align:center'>No report available!</p>";
+  }
   for (let record of records) {
     const totalAdult = await getTotalAdult(record);
     const totalBaby = await getTotalChildrenAndBaby(record);
@@ -244,6 +250,10 @@ async function fetchAllRecordOnDisplay() {
     "#total-attendance"
   ) as HTMLElement;
   totalAttendance.innerText = String(grandTotalAttendance);
+  const totalAttendanceElem = totalAttendance.parentElement as HTMLElement;
+  if(records.length > 0) {
+    totalAttendanceElem.classList.remove('collapse-summary-hide');
+  }
   display.innerHTML = result;
 }
 
@@ -278,10 +288,15 @@ function getService(service: number): string {
 }
 
 async function copyToClipboard() {
-  let records = await db.reports.bulkGet([1, 2]);
+  let records = await db.reports.bulkGet([1, 2]) as IReport[];
+  records = records.filter(record => record !== undefined);
   const date = new Date();
   const formattedDate = formatDate(date);
-  let output = "Attendance Stats for Abule-Egba Centre \n ----------------------------------";
+  let output = "";
+  if(records.length === 0) {
+    return alert("Unable to Copy: No Report Found");
+  }
+   output = "Attendance Stats for Abule-Egba Centre \n ----------------------------------";
   for (let record of records) {
     const totalAdult = await getTotalAdult(record);
     const totalBaby = await getTotalChildrenAndBaby(record);
