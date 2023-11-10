@@ -112,7 +112,7 @@ export function setupReport(element: HTMLButtonElement) {
   //     async () => await copyToClipboard()
   //   );
   // } else {
-    clipboard.addEventListener("click", async () => await copyToClipboard());
+  clipboard.addEventListener("click", async () => await copyToClipboard());
   // }
   // copyToClipboardInDetails
   const clipboardInDetails = document.getElementById(
@@ -124,10 +124,10 @@ export function setupReport(element: HTMLButtonElement) {
   //     async () => await copyToClipboardInDetails()
   //   );
   // } else {
-    clipboardInDetails.addEventListener(
-      "click",
-      async () => await copyToClipboardInDetails()
-    );
+  clipboardInDetails.addEventListener(
+    "click",
+    async () => await copyToClipboardInDetails()
+  );
   // }
   const navigation = document.getElementById("btn-navigation") as HTMLElement;
   navigation.addEventListener("click", async (event) => {
@@ -394,17 +394,20 @@ Chidren: ${record?.children.children}
   // return alert("Copied to clipboard.");
 }
 
-function copyText(output: string) {
-  navigator.clipboard.writeText(output)
-  .then(() => {
-    alert("Copied to clipboard.")
-  })
-  .catch((err) => {
-      alert('Clipboard write permission not granted');
-      alert(JSON.stringify(err))
-  });
+async function copyText(output: string) {
+  try {
+    await navigator.clipboard.write([
+      new ClipboardItem({
+        // The key is determined dynamically based on the blob's type.
+        "text/plain": Promise.resolve(output),
+      }),
+    ]);
+    alert("Copied to clipboard.");
+  } catch (err: any) {
+    alert("Clipboard write permission not granted");
+    alert(JSON.stringify(err));
+  }
 }
-
 
 // function isIOSMobileDevice() {
 //   return /Mobi/i.test(navigator.userAgent);
