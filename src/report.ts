@@ -342,9 +342,7 @@ Total attendance = ${total}
 Grand Total for the ${records.length} services; \n
 *Grand Total = ${grandTotalAttendance}*
   `;
-  setPermissionToClipboard();
-  await navigator.clipboard.writeText(output);
-  return alert("Copied to clipboard.");
+  return copyText(output);
 }
 
 async function copyToClipboardInDetails() {
@@ -391,24 +389,22 @@ Chidren: ${record?.children.children}
   `;
     output += elem;
   }
-  setPermissionToClipboard();
-  await navigator.clipboard.writeText(output);
-  return alert("Copied to clipboard.");
+  return copyText(output);
+  // await navigator.clipboard.writeText(output);
+  // return alert("Copied to clipboard.");
 }
 
-function setPermissionToClipboard() {
-  if (navigator.permissions) {
-    navigator.permissions.query({ name: 'clipboard-write' as PermissionName }).then(permissionStatus => {
-        if (permissionStatus.state === 'granted') {
-            alert('Clipboard write permission granted');
-        } else {
-            alert('Clipboard write permission not granted');
-        }
-    });
-} else {
-    alert('Navigator permissions API not supported');
+function copyText(output: string) {
+  navigator.clipboard.writeText(output)
+  .then(() => {
+    alert("Copied to clipboard.")
+  })
+  .catch((err) => {
+      alert('Clipboard write permission not granted');
+      alert(JSON.stringify(err))
+  });
 }
-}
+
 
 // function isIOSMobileDevice() {
 //   return /Mobi/i.test(navigator.userAgent);
