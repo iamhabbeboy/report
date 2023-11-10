@@ -327,6 +327,9 @@ Total attendance = ${total}
 Grand Total for the ${records.length} services; \n
 *Grand Total = ${grandTotalAttendance}*
   `
+  if(isMobileDevice()) {
+    return copyToClipboardForMobile(output);
+  }
   await navigator.clipboard.writeText(output);
   return alert("Copied to clipboard.")
 }
@@ -376,6 +379,32 @@ Chidren: ${record?.children.children}
   `;
   output += elem
   }
+  if(isMobileDevice()) {
+    return copyToClipboardForMobile(output);
+  }
   await navigator.clipboard.writeText(output);
   return alert("Copied to clipboard.")
+}
+
+function isMobileDevice() {
+  return /Mobi|Android/i.test(navigator.userAgent);
+}
+
+function copyToClipboardForMobile(data: string) {
+  // Create a text area to temporarily hold the text to copy
+  var textArea = document.createElement("textarea");
+  textArea.value = data;
+  // Append the text area to the document
+  document.body.appendChild(textArea);
+  // Select the text in the text area
+  textArea.select();
+  try {
+      // Copy the selected text to the clipboard
+      document.execCommand('copy');
+      alert("Report has been copied to clipboard!");
+  } catch (err) {
+      console.error('Unable to copy to clipboard', err);
+  }
+  // Remove the temporary text area
+  document.body.removeChild(textArea);
 }
