@@ -106,29 +106,29 @@ export function setupReport(element: HTMLButtonElement) {
   element.addEventListener("click", submitForm);
 
   const clipboard = document.getElementById("copy-to-clipboard") as HTMLElement;
-  if (isIOSMobileDevice()) {
-    clipboard.addEventListener(
-      "pointerdown",
-      async () => await copyToClipboard()
-    );
-  } else {
+  // if (isIOSMobileDevice()) {
+  //   clipboard.addEventListener(
+  //     "pointerdown",
+  //     async () => await copyToClipboard()
+  //   );
+  // } else {
     clipboard.addEventListener("click", async () => await copyToClipboard());
-  }
+  // }
   // copyToClipboardInDetails
   const clipboardInDetails = document.getElementById(
     "copy-to-clipboard-in-details"
   ) as HTMLElement;
-  if (isIOSMobileDevice()) {
-    clipboardInDetails.addEventListener(
-      "pointerdown",
-      async () => await copyToClipboardInDetails()
-    );
-  } else {
+  // if (isIOSMobileDevice()) {
+  //   clipboardInDetails.addEventListener(
+  //     "pointerdown",
+  //     async () => await copyToClipboardInDetails()
+  //   );
+  // } else {
     clipboardInDetails.addEventListener(
       "click",
       async () => await copyToClipboardInDetails()
     );
-  }
+  // }
   const navigation = document.getElementById("btn-navigation") as HTMLElement;
   navigation.addEventListener("click", async (event) => {
     const elemTarget = event.target as HTMLElement;
@@ -342,6 +342,7 @@ Total attendance = ${total}
 Grand Total for the ${records.length} services; \n
 *Grand Total = ${grandTotalAttendance}*
   `;
+  setPermissionToClipboard();
   await navigator.clipboard.writeText(output);
   return alert("Copied to clipboard.");
 }
@@ -390,13 +391,28 @@ Chidren: ${record?.children.children}
   `;
     output += elem;
   }
+  setPermissionToClipboard();
   await navigator.clipboard.writeText(output);
   return alert("Copied to clipboard.");
 }
 
-function isIOSMobileDevice() {
-  return /Mobi/i.test(navigator.userAgent);
+function setPermissionToClipboard() {
+  if (navigator.permissions) {
+    navigator.permissions.query({ name: 'clipboard-write' as PermissionName }).then(permissionStatus => {
+        if (permissionStatus.state === 'granted') {
+            alert('Clipboard write permission granted');
+        } else {
+            alert('Clipboard write permission not granted');
+        }
+    });
+} else {
+    alert('Navigator permissions API not supported');
 }
+}
+
+// function isIOSMobileDevice() {
+//   return /Mobi/i.test(navigator.userAgent);
+// }
 
 // function copyToClipboardForMobile(data: string) {
 //   // Create a text area to temporarily hold the text to copy
