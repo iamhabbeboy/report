@@ -1,7 +1,5 @@
 import { db } from "./database";
-import {
-  IReport,
-} from "./types";
+import { IReport } from "./types";
 
 interface GenericReport {
   [key: string]: any;
@@ -82,14 +80,16 @@ export function setupReport(element: HTMLButtonElement) {
     if (formInput.value === "") {
       return formInput.focus();
     }
-    const record = (await db.reports.get(Number(formInput.value))) as GenericReport;
+    const record = (await db.reports.get(
+      Number(formInput.value)
+    )) as GenericReport;
     const form = document.querySelectorAll("input");
     const offering = document.querySelector("#offering") as HTMLInputElement;
     for (let inputElement of form) {
       let inputAttr = inputElement.getAttribute("data-id") as string;
       if (inputAttr) {
         const [key, value] = inputAttr.split("-");
-        const data = record ? record[key as keyof IReport]: "";
+        const data = record ? record[key as keyof IReport] : "";
         inputElement.value = record ? data[value] : "0";
       }
     }
@@ -106,17 +106,29 @@ export function setupReport(element: HTMLButtonElement) {
   element.addEventListener("click", submitForm);
 
   const clipboard = document.getElementById("copy-to-clipboard") as HTMLElement;
-  clipboard.addEventListener(
-    "click",
-    async () => await copyToClipboard()
-  );
+  if (isIOSMobileDevice()) {
+    clipboard.addEventListener(
+      "pointerdown",
+      async () => await copyToClipboard()
+    );
+  } else {
+    clipboard.addEventListener("click", async () => await copyToClipboard());
+  }
   // copyToClipboardInDetails
-  const clipboardInDetails = document.getElementById("copy-to-clipboard-in-details") as HTMLElement;
-  clipboardInDetails.addEventListener(
-    "click",
-    async () => await copyToClipboardInDetails()
-  );
-
+  const clipboardInDetails = document.getElementById(
+    "copy-to-clipboard-in-details"
+  ) as HTMLElement;
+  if (isIOSMobileDevice()) {
+    clipboardInDetails.addEventListener(
+      "pointerdown",
+      async () => await copyToClipboardInDetails()
+    );
+  } else {
+    clipboardInDetails.addEventListener(
+      "click",
+      async () => await copyToClipboardInDetails()
+    );
+  }
   const navigation = document.getElementById("btn-navigation") as HTMLElement;
   navigation.addEventListener("click", async (event) => {
     const elemTarget = event.target as HTMLElement;
@@ -172,14 +184,14 @@ function getMoneyFormat(amount: number) {
 async function fetchRecordForInDetails() {
   let records = await getRecords();
   let result = "";
-  if(records.length === 0) {
+  if (records.length === 0) {
     result = "<p style='text-align:center'>No report available!</p>";
   }
   for (let record of records) {
     const totalAdult = await getTotalAdult(record);
     const totalChildrenAndBaby = await getTotalChildrenAndBaby(record);
     const total = await getTotalAttendance(record);
-    const services =  getService(Number(record?.service))
+    const services = getService(Number(record?.service));
     let elem = `
   <div>
   <div class="collapse">
@@ -232,7 +244,7 @@ let grandTotalAttendance = 0;
 async function fetchAllRecordOnDisplay() {
   let records = await getRecords();
   let result = "";
-  if(records.length === 0) {
+  if (records.length === 0) {
     result = "<p style='text-align:center'>No report available!</p>";
   }
   for (let record of records) {
@@ -258,8 +270,8 @@ async function fetchAllRecordOnDisplay() {
   ) as HTMLElement;
   totalAttendance.innerText = String(grandTotalAttendance);
   const totalAttendanceElem = totalAttendance.parentElement as HTMLElement;
-  if(records.length > 0) {
-    totalAttendanceElem.classList.remove('collapse-summary-hide');
+  if (records.length > 0) {
+    totalAttendanceElem.classList.remove("collapse-summary-hide");
   }
   display.innerHTML = result;
 }
@@ -280,7 +292,9 @@ async function getTotalChildrenAndBaby(record: IReport | undefined) {
 
 async function getTotalAttendance(record: IReport | undefined) {
   return (
-    (await getTotalChildrenAndBaby(record)) + (await getTotalAdult(record)) + Number(record?.teens.children)
+    (await getTotalChildrenAndBaby(record)) +
+    (await getTotalAdult(record)) +
+    Number(record?.teens.children)
   );
 }
 
@@ -295,16 +309,17 @@ function getService(service: number): string {
 }
 
 async function copyToClipboard() {
-  let records = await db.reports.bulkGet([1, 2]) as IReport[];
-  records = records.filter(record => record !== undefined);
+  let records = (await db.reports.bulkGet([1, 2])) as IReport[];
+  records = records.filter((record) => record !== undefined);
   const date = new Date();
   const formattedDate = formatDate(date);
   let output = "";
-  if(records.length === 0) {
+  if (records.length === 0) {
     return alert("Unable to Copy: No Report Found");
   }
-   output = "Attendance Stats for Abule-Egba Centre \n ----------------------------------\n";
-   output += `*Date: ${formattedDate}*`
+  output =
+    "Attendance Stats for Abule-Egba Centre \n ----------------------------------\n";
+  output += `*Date: ${formattedDate}*`;
   for (let record of records) {
     const totalAdult = await getTotalAdult(record);
     const totalBaby = await getTotalChildrenAndBaby(record);
@@ -317,35 +332,31 @@ ${service} Service
 Total Children & babies: ${totalBaby}
 Number of Adults: ${totalAdult}
 Total Teens: ${record?.teens.children}
-Offering: ${getMoneyFormat(Number(record?.offering)).replace('&#8358;', '₦')}
+Offering: ${getMoneyFormat(Number(record?.offering)).replace("&#8358;", "₦")}
 Total attendance = ${total}
 ----------------------------------
   `;
-  output += elem
+    output += elem;
   }
   output += `
 Grand Total for the ${records.length} services; \n
 *Grand Total = ${grandTotalAttendance}*
-  `
-  if(isMobileDevice()) {
-    return copyToClipboardForMobile(output);
-  }
+  `;
   await navigator.clipboard.writeText(output);
-  return alert("Copied to clipboard.")
+  return alert("Copied to clipboard.");
 }
 
-
 async function copyToClipboardInDetails() {
-  let records = await db.reports.bulkGet([1, 2]) as IReport[];
-  records = records.filter(record => record !== undefined);
+  let records = (await db.reports.bulkGet([1, 2])) as IReport[];
+  records = records.filter((record) => record !== undefined);
   const date = new Date();
   const formattedDate = formatDate(date);
   let output = "";
-  if(records.length === 0) {
+  if (records.length === 0) {
     return alert("Unable to Copy: No Report Found");
   }
-   output = "Attendance Stats Analysis \n ----------------------------------\n";
-   output += `*Date: ${formattedDate}*`
+  output = "Attendance Stats Analysis \n ----------------------------------\n";
+  output += `*Date: ${formattedDate}*`;
   for (let record of records) {
     const totalAdult = await getTotalAdult(record);
     const totalBaby = await getTotalChildrenAndBaby(record);
@@ -375,36 +386,33 @@ Chidren: ${record?.children.children}
 -------------------------------------------------
 *Total Attendance: ${total}*
 -------------------------------------------------
-*Offering: ${getMoneyFormat(Number(record?.offering)).replace('&#8358;', '₦')}*
+*Offering: ${getMoneyFormat(Number(record?.offering)).replace("&#8358;", "₦")}*
   `;
-  output += elem
-  }
-  if(isMobileDevice()) {
-    return copyToClipboardForMobile(output);
+    output += elem;
   }
   await navigator.clipboard.writeText(output);
-  return alert("Copied to clipboard.")
+  return alert("Copied to clipboard.");
 }
 
-function isMobileDevice() {
-  return /Mobi|Android/i.test(navigator.userAgent);
+function isIOSMobileDevice() {
+  return /Mobi/i.test(navigator.userAgent);
 }
 
-function copyToClipboardForMobile(data: string) {
-  // Create a text area to temporarily hold the text to copy
-  var textArea = document.createElement("textarea");
-  textArea.value = data;
-  // Append the text area to the document
-  document.body.appendChild(textArea);
-  // Select the text in the text area
-  textArea.select();
-  try {
-      // Copy the selected text to the clipboard
-      document.execCommand('copy');
-      alert("Report has been copied to clipboard!");
-  } catch (err) {
-      console.error('Unable to copy to clipboard', err);
-  }
-  // Remove the temporary text area
-  document.body.removeChild(textArea);
-}
+// function copyToClipboardForMobile(data: string) {
+//   // Create a text area to temporarily hold the text to copy
+//   var textArea = document.createElement("textarea");
+//   textArea.value = data;
+//   // Append the text area to the document
+//   document.body.appendChild(textArea);
+//   // Select the text in the text area
+//   textArea.select();
+//   try {
+//     // Copy the selected text to the clipboard
+//     document.execCommand("copy");
+//     alert("Report has been copied to clipboard!");
+//   } catch (err) {
+//     console.error("Unable to copy to clipboard", err);
+//   }
+//   // Remove the temporary text area
+//   document.body.removeChild(textArea);
+// }
