@@ -395,57 +395,12 @@ Chidren: ${record?.children.children}
 }
 
 async function copyText(output: string) {
-  // try {
-  //   await navigator.clipboard.writeText(output);
-  //   alert("Copied to clipboard.");
-  // } catch (err: any) {
-  //   alert("Clipboard write permission not granted");
-  // }
-    return new Promise((resolve, reject) => {
-      if (navigator?.clipboard && typeof ClipboardItem !== 'undefined') {
-        const type = "text/plain";
-        const blob = new Blob([output], { type });
-        const data = [new ClipboardItem({ [type]: blob })];
-  
-        navigator.permissions.query({ name: "clipboard-write" as PermissionName })
-          .then(permission => {
-            if (permission.state === "granted" || permission.state === "prompt") {
-              alert("Copied to clipboard.");
-              navigator.clipboard.write(data).then(resolve).catch(reject);
-            } else {
-              reject(new Error("Permission not granted!"));
-            }
-          })
-          .catch(reject);
-      } else if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
-        const textarea = document.createElement("textarea");
-        textarea.value = output;
-        textarea.style.position = "fixed";
-        textarea.style.width = '2em';
-        textarea.style.height = '2em';
-        textarea.style.padding = "0";
-        textarea.style.border = 'none';
-        textarea.style.outline = 'none';
-        textarea.style.boxShadow = 'none';
-        textarea.style.background = 'transparent';
-  
-        document.body.appendChild(textarea);
-        textarea.focus();
-        textarea.select();
-  
-        try {
-          document.execCommand("copy");
-          document.body.removeChild(textarea);
-          resolve("");
-          alert("Copied to clipboard.");
-        } catch (e) {
-          document.body.removeChild(textarea);
-          reject(e);
-        }
-      } else {
-        reject(new Error("None of the copying methods are supported by this browser!"));
-      }
-    });  
+  try {
+    await navigator.clipboard.writeText(output);
+    alert("Copied to clipboard.");
+  } catch (err: any) {
+    alert("Clipboard write permission not granted");
+  }
 }
 
 // function isIOSMobileDevice() {
