@@ -396,16 +396,10 @@ Chidren: ${record?.children.children}
 
 async function copyText(output: string) {
   try {
-    await navigator.clipboard.write([
-      new ClipboardItem({
-        // The key is determined dynamically based on the blob's type.
-        "text/plain": Promise.resolve(output),
-      }),
-    ]);
+    await navigator.clipboard.writeText(output);
     alert("Copied to clipboard.");
   } catch (err: any) {
     alert("Clipboard write permission not granted");
-    alert(JSON.stringify(err));
   }
 }
 
