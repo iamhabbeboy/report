@@ -1,3 +1,4 @@
+import { copyForIOS, isIOS } from "./clipboard";
 import { db } from "./database";
 import { IReport } from "./types";
 
@@ -396,6 +397,10 @@ Chidren: ${record?.children.children}
 
 async function copyText(output: string) {
   try {
+    if(isIOS()) {
+      copyForIOS(output);
+      return alert("Copied to clipboard, IOS.")
+    } 
     await navigator.clipboard.writeText(output);
     alert("Copied to clipboard.");
   } catch (err: any) {
