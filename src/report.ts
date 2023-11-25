@@ -312,6 +312,7 @@ async function fetchAllRecordOnDisplay() {
     </div>
       <p>Total Adult: ${totalAdult}</p>
       <p>Total Children & Baby: ${totalBaby}</p>
+      <p>Teens: ${record?.teens?.children}</p>
       <p>Offering: ${getMoneyFormat(Number(record?.offering))}</p>
       <p>Total First timer: ${record?.other.first_timer || 0}</p>
       <p><strong>Total Attendance: ${total}</strong></p>
