@@ -7,6 +7,15 @@
     <title>TCN Attendance Report</title>
   </head>
   <body>
+    <div id="printable-board" class="printing">
+      <div class="logo">
+        <img src="public/logo.jpg" />
+        <p style="font-weight:bold" id="report-title"></p>
+        <p>Date: <span id="print-date"></span> </p>
+      </div>
+      <div id="attendance-report" class="attendance-print-preview" style="text-align:left"></div>
+      <p style="text-align: center;font-size: 10px;">Developed &nbsp;@&nbsp; <a href="https://letcodeng.com/">letcodeNG.com</a> 
+    </div>
     <div class="layout">
       <h1>TCN Attendance Report</h1>
       <button class="button" id="btn-navigation">Preview</button>
@@ -116,7 +125,16 @@
             />
             <h4>Offering</h4>
             <input type="text" class="form-input" value="0" id="offering" />
-            <p></p>
+              <p></p>
+            <label>First Timer</label>
+            <input
+              type="number"
+              class="form-input"
+              value="0"
+              id="first-timer"
+              data-id="other-first_timer"
+            />
+                <p></p>
             <button class="button button__size button__misc" id="form-button">
               Submit
             </button>
@@ -131,7 +149,10 @@
         <div class="collapse-summary"> Report summary(in-details)</div>
         <div class="collapse-summary-show">
           <button class="btn text-small float-right" id="copy-to-clipboard-in-details">
-            <img src="public/copy-icon.svg" width="10" height="10" /> Copy
+            <img src="public/copy-icon.svg" width="15" height="15" /> Copy
+          </button>
+          <button class="btn text-small float-right" id="download-in-details" style="margin-right: 10px;">
+            <img src="public/folder-download-line.svg" width="15" height="15" /> Download
           </button>
           <p style="clear:both"></p>
         <div id="service-board"></div>
@@ -143,14 +164,20 @@
           <button class="btn text-small float-right" id="copy-to-clipboard">
             <img src="public/copy-icon.svg" width="10" height="10" /> Copy
           </button>
+          <button class="btn text-small float-right" id="download" style="margin-right: 10px;">
+            <img src="public/folder-download-line.svg" width="15" height="15" /> Download
+          </button>
           <p style="clear:both"></p>
-          <div id="summary">
-            </div>
-              <div class="block">
-                <p class="title collapse-summary-hide">Grand Total Attendance: <span id="total-attendance">0</span></p>
+          <div id="summary-data">
+            <div id="summary">
               </div>
-          </div>
+                <div class="block">
+                 <p class="title collapse-summary-hide">Total First Timer: <span id="total-first-timer">0</span></p>
+                  <p class="title collapse-summary-hide">Grand Total Attendance: <span id="total-attendance">0</span></p>
+                </div>
+            </div>
           <p></p>
+         </div>
         <div>
       </div>
     </div>

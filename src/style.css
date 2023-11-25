@@ -207,3 +207,20 @@ h5 {
     line-height: 1.1;
   }
 }
+
+.printing { 
+  width: 80%;
+  margin: auto;
+  display: none;
+}
+
+.printing > .logo {
+  color: #333;
+  text-align: center;
+}
+
+.attendance-print-preview {
+  text-align: left;
+  width: 400px;
+  margin: auto;
+}

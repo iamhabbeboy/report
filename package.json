@@ -13,6 +13,8 @@
     "vite": "^4.4.5"
   },
   "dependencies": {
-    "dexie": "^3.2.4"
+    "dexie": "^3.2.4",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.1"
   }
 }

@@ -1,6 +1,8 @@
+import html2canvas from "html2canvas";
 import { copyForIOS, isIOS } from "./clipboard";
 import { db } from "./database";
 import { IReport } from "./types";
+import jsPDF from "jspdf";
 
 interface GenericReport {
   [key: string]: any;
@@ -13,12 +15,17 @@ export function setupReport(element: HTMLButtonElement) {
       "#service-form"
     ) as HTMLSelectElement;
     const offering = document.querySelector("#offering") as HTMLInputElement;
+    const firstTimer = document.querySelector("#first-timer") as HTMLInputElement;
     if (service.value === "") {
       return service.focus();
     }
 
     if (offering.value === "") {
       return offering.focus();
+    }
+
+    if (firstTimer.value === "") {
+      return firstTimer.focus();
     }
     const report: GenericReport = {
       id: Number(service.value),
@@ -47,6 +54,7 @@ export function setupReport(element: HTMLButtonElement) {
       other: {
         traffic: 0,
         info_desk: 0,
+        first_timer: 0,
       },
       date: new Date().getTime(),
     };
@@ -86,6 +94,7 @@ export function setupReport(element: HTMLButtonElement) {
     )) as GenericReport;
     const form = document.querySelectorAll("input");
     const offering = document.querySelector("#offering") as HTMLInputElement;
+    // const offering = document.querySelector("#offering") as HTMLInputElement;
     for (let inputElement of form) {
       let inputAttr = inputElement.getAttribute("data-id") as string;
       if (inputAttr) {
@@ -119,17 +128,56 @@ export function setupReport(element: HTMLButtonElement) {
   const clipboardInDetails = document.getElementById(
     "copy-to-clipboard-in-details"
   ) as HTMLElement;
-  // if (isIOSMobileDevice()) {
-  //   clipboardInDetails.addEventListener(
-  //     "pointerdown",
-  //     async () => await copyToClipboardInDetails()
-  //   );
-  // } else {
+
   clipboardInDetails.addEventListener(
     "click",
     async () => await copyToClipboardInDetails()
   );
-  // }
+
+  const downloadInDetailsBtnElem = document.getElementById(
+    "download-in-details"
+  ) as HTMLElement;
+
+  const reportTitle = document.getElementById(
+    "report-title"
+  ) as HTMLElement;
+
+  downloadInDetailsBtnElem.addEventListener(
+    "click",
+    async () => {
+      const displayElem = document.getElementById("printable-board") as HTMLElement;
+      displayElem.style.display = "block";
+      reportTitle.innerHTML = "Today's &nbsp; Attendance &nbsp; Report &nbsp; (in detail)"
+      const elem = document.getElementById("service-board") as HTMLElement;
+      const printDate = document.getElementById("print-date") as HTMLElement;
+      printDate.innerHTML = getAfricanDateFormat();
+      const printPreview = document.getElementById("attendance-report") as HTMLElement;
+      printPreview.innerHTML = elem.innerHTML;
+      await download("printable-board");
+      displayElem.style.display = "none";
+    }
+  );
+
+  const downloadBtnElem = document.getElementById(
+    "download"
+  ) as HTMLElement;
+
+  downloadBtnElem.addEventListener(
+    "click",
+    async () => {
+      const displayElem = document.getElementById("printable-board") as HTMLElement;
+      displayElem.style.display = "block";
+      reportTitle.innerHTML = "Today's &nbsp; Attendance &nbsp; Report &nbsp; (summary)"
+      const reportSummary = document.getElementById("summary-data") as HTMLElement;
+      const printDate = document.getElementById("print-date") as HTMLElement;
+      printDate.innerHTML = getAfricanDateFormat();
+      const printPreview = document.getElementById("attendance-report") as HTMLElement;
+      printPreview.innerHTML = reportSummary.innerHTML;
+      await download("printable-board")
+      displayElem.style.display = "none";
+    }
+  );
+
   const navigation = document.getElementById("btn-navigation") as HTMLElement;
   navigation.addEventListener("click", async (event) => {
     const elemTarget = event.target as HTMLElement;
@@ -196,7 +244,7 @@ async function fetchRecordForInDetails() {
     let elem = `
   <div>
   <div class="collapse">
-    <h5>Service: ${services}</h5>
+    <h5>${services} &nbsp;service</h5>
   </div>
   <div class="block">
     <p class="title">Adult</p>
@@ -221,6 +269,7 @@ async function fetchRecordForInDetails() {
     <p class="title">Teen: ${record?.teens.children}</p>
   </div>
   <div class="block">
+  <p class="title">First Timer: ${record?.other.first_timer || 0}</p>
   <p class="title">Total Attendance: ${total}</p>
 </div>
   <div class="block">
@@ -248,24 +297,33 @@ async function fetchAllRecordOnDisplay() {
   if (records.length === 0) {
     result = "<p style='text-align:center'>No report available!</p>";
   }
+  let totalFirstTimer = 0;
   for (let record of records) {
     const totalAdult = await getTotalAdult(record);
     const totalBaby = await getTotalChildrenAndBaby(record);
     const total = await getTotalAttendance(record);
     const service = getService(Number(record?.service));
+    totalFirstTimer += record?.other.first_timer || 0
     grandTotalAttendance += total;
     const elem = `
     <div class="block">
-      <p class="title">${service} Service</p>
+    <div class="collapse">
+      <h5>${service}-Service</h5>
+    </div>
       <p>Total Adult: ${totalAdult}</p>
       <p>Total Children & Baby: ${totalBaby}</p>
       <p>Offering: ${getMoneyFormat(Number(record?.offering))}</p>
+      <p>Total First timer: ${record?.other.first_timer || 0}</p>
       <p><strong>Total Attendance: ${total}</strong></p>
     </div>
     `;
     result += elem;
   }
   const display = document.querySelector("#summary") as HTMLElement;
+  const totalFirstTimerRecorded = document.querySelector(
+    "#total-first-timer"
+  ) as HTMLElement;
+  totalFirstTimerRecorded.innerText = String(totalFirstTimer)
   const totalAttendance = document.querySelector(
     "#total-attendance"
   ) as HTMLElement;
@@ -273,6 +331,8 @@ async function fetchAllRecordOnDisplay() {
   const totalAttendanceElem = totalAttendance.parentElement as HTMLElement;
   if (records.length > 0) {
     totalAttendanceElem.classList.remove("collapse-summary-hide");
+    const firstTimerElem = totalFirstTimerRecorded.parentElement as HTMLElement;
+    firstTimerElem.classList.remove("collapse-summary-hide");
   }
   display.innerHTML = result;
 }
@@ -299,6 +359,14 @@ async function getTotalAttendance(record: IReport | undefined) {
   );
 }
 
+function getAfricanDateFormat() {
+  const date = new Date();
+  const day = date.getDate().toString().padStart(2, "0");
+  const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Months are zero-based
+  const year = date.getFullYear();
+
+  return `${day}-${month}-${year}`;
+}
 function formatDate(date: Date) {
   const options = { day: "2-digit", month: "long", year: "numeric" } as any;
   return date.toLocaleDateString("en-US", options);
@@ -321,18 +389,21 @@ async function copyToClipboard() {
   output =
     "Attendance Stats for Abule-Egba Centre \n ----------------------------------\n";
   output += `*Date: ${formattedDate}*`;
+  let totalCalculatedFirstTimer = 0;
   for (let record of records) {
     const totalAdult = await getTotalAdult(record);
     const totalBaby = await getTotalChildrenAndBaby(record);
     const total = await getTotalAttendance(record);
     // grandTotalAttendance += total;
     const service = getService(Number(record?.service));
+    totalCalculatedFirstTimer += Number(record.other.first_timer || 0);
     const elem = `
 Service: 1st & 2nd Services
 ${service} Service
 Total Children & babies: ${totalBaby}
 Number of Adults: ${totalAdult}
 Total Teens: ${record?.teens.children}
+First timer: ${record?.other.first_timer || 0}
 Offering: ${getMoneyFormat(Number(record?.offering)).replace("&#8358;", "₦")}
 Total attendance = ${total}
 ----------------------------------
@@ -340,6 +411,7 @@ Total attendance = ${total}
     output += elem;
   }
   output += `
+Total First timer: ${totalCalculatedFirstTimer}
 Grand Total for the ${records.length} services; \n
 *Grand Total = ${grandTotalAttendance}*
   `;
@@ -355,7 +427,7 @@ async function copyToClipboardInDetails() {
   if (records.length === 0) {
     return alert("Unable to Copy: No Report Found");
   }
-  output = "Attendance Stats Analysis \n ----------------------------------\n";
+  output = "Attendance Stats Analysis \n ------------------------------\n";
   output += `*Date: ${formattedDate}*`;
   for (let record of records) {
     const totalAdult = await getTotalAdult(record);
@@ -364,7 +436,7 @@ async function copyToClipboardInDetails() {
     const service = getService(Number(record?.service));
     const elem = `
 Service: 1st & 2nd Services
-Service: ${service}
+${service} Service
 *Adult*\n
 Main: ${record?.main.adult}
 Extension: ${record?.extension.adult}
@@ -374,18 +446,20 @@ Info desk: ${record?.other.info_desk}
 Teen teacher: ${record?.teens.adult}
 Children teacher: ${record?.children.adult}
 *Total: ${totalAdult}*
--------------------------------------------------
+------------------------------
 *Baby & Children*
 Main(Baby): ${record?.main.baby}
 Extension(Baby): ${record?.extension.baby}
 Overflow/Cinema(Baby): ${record?.overflow.baby}
 Chidren: ${record?.children.children}
 *Total: ${totalBaby}*
--------------------------------------------------
+------------------------------
 *Teens:* ${record?.teens.children}
--------------------------------------------------
+------------------------------
+*First Timer: ${record?.other.first_timer || 0}*
+------------------------------
 *Total Attendance: ${total}*
--------------------------------------------------
+------------------------------
 *Offering: ${getMoneyFormat(Number(record?.offering)).replace("&#8358;", "₦")}*
   `;
     output += elem;
@@ -395,12 +469,52 @@ Chidren: ${record?.children.children}
   // return alert("Copied to clipboard.");
 }
 
+const download = async (reportElementId: string) => {
+  html2canvas(document.getElementById(reportElementId) as HTMLElement, {
+    allowTaint: true,
+    scale: 4,
+  }).then((canvas) => {
+    let HTMLWidth = canvas.width;
+    let HTMLHeight = canvas.height;
+    let topLeftMargin = 16;
+    let PDFWidth = HTMLWidth + topLeftMargin * 2;
+    let PDFHeight = PDFWidth * 1.5 + topLeftMargin * 2;
+    let canvasImageWidth = HTMLWidth;
+    let canvasImageHeight = HTMLHeight;
+    let totalPDFPages = Math.ceil(HTMLHeight / PDFHeight) - 1;
+    canvas.getContext("2d");
+    let imgData = canvas.toDataURL("image/png", 1.0);
+    let pdf = new jsPDF("p", "pt", [PDFWidth, PDFHeight]);
+    pdf.addImage(
+      imgData,
+      "PNG",
+      topLeftMargin,
+      topLeftMargin,
+      canvasImageWidth,
+      canvasImageHeight
+    );
+    for (let i = 1; i <= totalPDFPages; i++) {
+      pdf.addPage([PDFWidth, PDFHeight], "p");
+      pdf.addImage(
+        imgData,
+        "PNG",
+        topLeftMargin,
+        -(PDFHeight * i) + topLeftMargin * 4,
+        canvasImageWidth,
+        canvasImageHeight
+      );
+    }
+    const dateFormater = getAfricanDateFormat();
+    pdf.save(`${dateFormater}-report.pdf`);
+  });
+};
+
 async function copyText(output: string) {
   try {
-    if(isIOS()) {
+    if (isIOS()) {
       copyForIOS(output);
-      return alert("Copied to clipboard, IOS.")
-    } 
+      return alert("Copied to clipboard, IOS.");
+    }
     await navigator.clipboard.writeText(output);
     alert("Copied to clipboard.");
   } catch (err: any) {
