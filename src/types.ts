@@ -11,6 +11,21 @@ export interface IReport {
     other: OtherAttendance;
   }
 
+  export interface IChildren {
+    age: number;
+    ageData: ChildAge,
+    name: string;
+    dob: string;
+    parentName: string;
+    parentPhone: string;
+    image: string;
+  }
+
+  interface ChildAge {
+    months: number;
+    years: number;
+  }
+
 export interface OtherAttendance {
     [key:string]: number; // traffic and info desk
 }

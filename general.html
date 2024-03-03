@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TCN Attendance Report</title>
+  </head>
+  <body>
+    <div id="printable-board" class="printing">
+      <div class="logo">
+        <img src="public/logo.jpg" />
+        <p style="font-weight:bold" id="report-title"></p>
+        <p>Date: <span id="print-date"></span> </p>
+      </div>
+      <div id="attendance-report" class="attendance-print-preview" style="text-align:left"></div>
+      <p style="text-align: center;font-size: 10px;">Developed &nbsp;@&nbsp; <a href="https://letcodeng.com/">letcodeNG.com</a> 
+    </div>
+    <div class="layout">
+      <h1>TCN Attendance Report</h1>
+      <div style="display: flex;justify-content: space-between">
+        <a href="javascript:window.history.back()">&laquo; Back </a>
+      <button class="button" id="btn-navigation">Preview</button>
+      </div>
+      <div id="form-layout" style="display:block">
+        <div id="notify" class="notify"></div>
+        <div id="service">
+          <div class="collapse-summary-show">
+            <p></p>
+            <h4>Main Auditorium</h4>
+            <label>Service</label>
+            <select class="form-input" id="service-form">
+              <option value="">Select service</option>
+              <option value="1">First service</option>
+              <option value="2">Second service</option>
+            </select>
+            <a href="#" class="text-small" id="find-service" style="text-decoration:underline">Find</a>
+            <p></p>
+            <label>Adult</label>
+            <input
+              type="number"
+              class="form-input"
+              value="0"
+              data-id="main-adult"
+            />
+            <p></p>
+            <label>Baby</label>
+            <input
+              type="number"
+              class="form-input"
+              value="0"
+              data-id="main-baby"
+            />
+            <h4>Extension</h4>
+            <label>Adult</label>
+            <input type="number" class="form-input" value="0" data-id="extension-adult"/>
+            <p></p>
+            <label>Baby</label>
+            <input
+              type="number"
+              class="form-input"
+              value="0"
+              data-id="extension-baby"
+            />
+            <h4>Overflow</h4>
+            <label>Adult</label>
+            <input
+              type="number"
+              class="form-input"
+              value="0"
+              data-id="overflow-adult"
+            />
+            <p></p>
+            <label>Baby</label>
+            <input
+              type="number"
+              class="form-input"
+              value="0"
+              data-id="overflow-baby"
+            />
+            <h4>Children</h4>
+            <label>Teacher</label>
+            <input
+              type="number"
+              class="form-input"
+              value="0"
+              data-id="children-adult"
+            />
+            <p></p>
+            <label>Children</label>
+            <input
+              type="number"
+              class="form-input"
+              value="0"
+              data-id="children-children"
+            />
+            <h4>Teens</h4>
+            <label>Teacher</label>
+            <input
+              type="number"
+              class="form-input"
+              value="0"
+              data-id="teens-adult"
+            />
+            <p></p>
+            <label>Teen</label>
+            <input
+              type="number"
+              class="form-input"
+              value="0"
+              data-id="teens-children"
+            />
+            <h4>Others</h4>
+            <label>Traffic</label>
+            <input
+              type="number"
+              class="form-input"
+              value="0"
+              data-id="other-traffic"
+            />
+            <p></p>
+            <label>Info Desk</label>
+            <input
+              type="number"
+              class="form-input"
+              value="0"
+              data-id="other-info_desk"
+            />
+            <h4>Offering</h4>
+            <input type="text" class="form-input" value="0" id="offering" />
+              <p></p>
+            <label>First Timer</label>
+            <input
+              type="number"
+              class="form-input"
+              value="0"
+              id="first-timer"
+              data-id="other-first_timer"
+            />
+                <p></p>
+            <button class="button button__size button__misc" id="form-button">
+              Submit
+            </button>
+            <br />
+            <br />
+          </div>
+        </div>
+      </div>
+      <div id="preview-layout" class="collapse-summary-hide">
+        <h5 class="date">Date: <span id="date">N/A</span></h5>
+      <div class="collapsible">
+        <div class="collapse-summary"> Report summary(in-details)</div>
+        <div class="collapse-summary-show">
+          <button class="btn text-small float-right" id="copy-to-clipboard-in-details">
+            <img src="public/copy-icon.svg" width="15" height="15" /> Copy
+          </button>
+          <button class="btn text-small float-right" id="download-in-details" style="margin-right: 10px;">
+            <img src="public/folder-download-line.svg" width="15" height="15" /> Download
+          </button>
+          <p style="clear:both"></p>
+        <div id="service-board"></div>
+        </div>
+      </div>
+      <div>
+          <div class="collapse-summary"> Report Summary</div>
+            <div class="collapse-summary-hide">
+          <button class="btn text-small float-right" id="copy-to-clipboard">
+            <img src="public/copy-icon.svg" width="10" height="10" /> Copy
+          </button>
+          <button class="btn text-small float-right" id="download" style="margin-right: 10px;">
+            <img src="public/folder-download-line.svg" width="15" height="15" /> Download
+          </button>
+          <p style="clear:both"></p>
+          <div id="summary-data">
+            <div id="summary">
+              </div>
+                <div class="block">
+                 <p class="title collapse-summary-hide">Total First Timer: <span id="total-first-timer">0</span></p>
+                  <p class="title collapse-summary-hide">Grand Total Attendance: <span id="total-attendance">0</span></p>
+                </div>
+            </div>
+          <p></p>
+         </div>
+        <div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

@@ -224,3 +224,89 @@ h5 {
   width: 400px;
   margin: auto;
 }
+
+/**
+ - Children register
+*/
+.children__layout {
+  border: 1px solid #ccc;
+  padding-top: 15px;
+  padding-bottom: 2px;
+  padding-left: 2px;
+  padding-right: 2px;
+  margin: auto;
+  text-align: center;
+  /* display: flex; */
+}
+
+.children {
+  margin-top: 15px;
+  margin-bottom: 25px;
+}
+
+.children__name {
+  padding-left: 10px;
+}
+
+.children__option {
+  background: rgba(59, 130, 246, 0.7);
+  padding: 10px;
+}
+
+.option {
+  margin-top: 10px;
+}
+
+.option__input{
+  padding: 3px;
+  width: 80px;
+}
+
+.report__link {
+  margin-bottom: 10px;
+}
+
+.report__layout {
+  border: 1px solid #EEE;
+  border-radius: 9px;
+  padding: 30px 10px;
+  transition: .2s all;
+}
+
+.report__layout:hover {
+  background: indigo;
+  color: #FFF;
+}
+
+.form-group {
+  margin-bottom: 10px;
+}
+
+.image__capture {
+  background: #ccc;
+  border-radius: 9px;
+  margin: auto;
+  text-align: center;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.image__preview {
+  width: 300px;
+  margin: auto;
+  padding: 10px;
+  margin-bottom: 0px;
+}
+
+.video {
+  width: 300px;
+  height: 300px;
+  object-fit: cover;
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 28px;
+    text-align: center;
+  }
+}

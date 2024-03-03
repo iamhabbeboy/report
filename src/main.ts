@@ -1,5 +1,9 @@
-import './style.css'
-import { setupReport } from './report.ts'
+import "./style.css";
+import { setupReport } from "./report.ts";
+import { setupChildren } from "./children.ts";
 // document.querySelector<HTMLDivElement>('#app')!.innerHTML = ""
-setupReport(document.querySelector<HTMLButtonElement>('#form-button')!)
-// setupCounter(document.querySelector<HTMLButtonElement>('#counter')!)
+const elem = document.querySelector<HTMLButtonElement>("#form-button");
+if(elem) {
+  setupReport(elem!);
+}
+setupChildren();
