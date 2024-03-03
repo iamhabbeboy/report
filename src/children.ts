@@ -41,7 +41,8 @@ export function setupChildren() {
     };
     const res = await db.children.add(child as IChildren);
     if(res) {
-        return alert("Record added succesfully!");
+        alert("Record added succesfully!");
+        window.location.href = "/children/"
     }
     return alert("Error occured!");
   });

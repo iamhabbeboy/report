@@ -38,7 +38,7 @@
           }
           if (hasTab && !hasCaptured) {
             navigator.mediaDevices
-              .getUserMedia({ video: true })
+              .getUserMedia({ video: {facingMode: 'environment'} })
               .then(function (stm) {
                 stream = stm;
                 video.srcObject = stm;
@@ -60,7 +60,7 @@
           evt.target.style.display = 'none';
           snapButton.style.display = 'block';
           navigator.mediaDevices
-              .getUserMedia({ video: true })
+              .getUserMedia({ video: {facingMode: 'environment'} })
               .then(function (stm) {
                 stream = stm;
                 video.srcObject = stm;
