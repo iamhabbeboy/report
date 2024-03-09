@@ -183,11 +183,17 @@
                     </div>
                     <button
                         class="button"
-                        id=""
+                        id="btn-form-submitted"
                         style="width: 100%"
                         type="submit"
                     >
                         Submit
+                        <img
+                            src="./public/loader.svg"
+                            width="20"
+                            style="display: none"
+                            id="img-loader"
+                        />
                     </button>
                 </form>
                 <br />
@@ -211,6 +217,14 @@
                 <div>
                     <div id="notify" class="notify"></div>
                     <h4>Search result:</h4>
+                    <p style="display: none" id="preload-record">
+                        <img
+                            src="./public/loader2.svg"
+                            width="20"
+                            id="img-loader"
+                        />
+                        Please wait ....
+                    </p>
                     <div id="children-list"></div>
                 </div>
             </div>

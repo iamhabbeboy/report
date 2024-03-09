@@ -16,10 +16,11 @@ export interface IChildren {
   ageData: ChildAge;
   name: string;
   dob: string;
+  image: string;
   parentName: string;
   parentPhone: string;
   homeAddress: string;
-  image: string;
+  created_at: number;
 }
 
 interface ChildAge {

@@ -1,5 +1,9 @@
+import { getTimestamp } from "./common";
 import { db } from "./database";
+import { GoogleFirestoreDatabase } from "./firebase";
 import { IChildren } from "./types";
+
+const collectionName = "tcn-children";
 
 export function setupChildren() {
   const form = document.getElementById("capture-record") as HTMLElement;
@@ -16,6 +20,9 @@ export function setupChildren() {
     const homeAddress = document.getElementById(
       "home-address",
     ) as HTMLTextAreaElement;
+    const btnSubmitted = document.getElementById(
+      "btn-form-submitted",
+    ) as HTMLButtonElement;
     const img = document.getElementById("preview") as HTMLImageElement;
     if (img.src === "") {
       return alert("Kindly capture an image before you proceed");
@@ -43,19 +50,39 @@ export function setupChildren() {
       parentPhone: parentPhone.value,
       homeAddress: homeAddress.value,
       image: img.src,
+      created_at: getTimestamp(),
     };
-    const res = await db.children.add(child as IChildren);
-    if (res) {
-      alert("Record added succesfully!");
-      window.location.href = "/children/";
+    btnSubmitted.setAttribute("disabled", "true");
+    const elem = btnSubmitted.children[0] as HTMLImageElement;
+    elem.style.display = "inline-block";
+    // const res = await db.children.add(child as IChildren);
+
+    try {
+      const fb = new GoogleFirestoreDatabase();
+      const resp = await fb.addToCollection(collectionName, child);
+      if (resp) {
+        parentName.value = "";
+        parentPhone.value = "";
+        childName.value = "";
+        childDob.value = "";
+        homeAddress.value = "";
+        alert("Record added succesfully!");
+        window.location.href = "/children/";
+      }
+      return Response.json({ error: "Error occured" });
+    } catch (e) {
+      return alert("Error occured!");
     }
-    return alert("Error occured!");
   });
   getAllChildren();
 }
 
 async function getAllChildren() {
-  const getAllChildren = await db.children.where("age").above(0).toArray();
+  // const getAllChildren = await db.children.where("age").above(0).toArray();
+  const loader = document.getElementById("preload-record") as HTMLDivElement;
+  loader.style.display = "block";
+  const fb = new GoogleFirestoreDatabase();
+  const getAllChildren = await fb.getCollectionLimit(collectionName);
   const childrenList = document.getElementById("children-list") as HTMLElement;
   let result = "";
   getAllChildren.forEach((child) => {
@@ -80,4 +107,5 @@ async function getAllChildren() {
       </div>`;
   });
   childrenList.innerHTML = result;
+  loader.style.display = "none";
 }
