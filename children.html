@@ -31,7 +31,7 @@
                         this.innerText = "Show record";
                         hasTab = true;
                     }
-                    console.log("hasTab:", hasTab, "hasCaptured", !hasCaptured);
+                    //console.log("hasTab:", hasTab, "hasCaptured", !hasCaptured);
                     if (!hasTab) {
                         video.pause();
                         stream.getTracks().forEach((track) => track.stop());
@@ -141,6 +141,7 @@
                             value=""
                             id="child-name"
                             required
+                            placeholder="Child's first name only"
                         />
                     </div>
                     <div class="form-group">
@@ -161,6 +162,7 @@
                             value=""
                             id="parent-name"
                             required
+                            placeholder="Mr & Mrs John"
                         />
                     </div>
                     <div class="form-group">
@@ -171,6 +173,7 @@
                             value=""
                             id="parent-phone"
                             required
+                            placeholder="+234"
                         />
                     </div>
                     <div class="form-group">
@@ -179,6 +182,7 @@
                             class="form-input"
                             id="home-address"
                             required
+                            placeholder="Enter home address"
                         ></textarea>
                     </div>
                     <button
@@ -189,7 +193,7 @@
                     >
                         Submit
                         <img
-                            src="./public/loader.svg"
+                            src="/loader.svg"
                             width="20"
                             style="display: none"
                             id="img-loader"
@@ -202,15 +206,17 @@
             <div id="record-list">
                 <div>
                     <h4>Search</h4>
-                    <select class="form-input">
-                        <option value="">Search by</option>
-                        <option value="name">Name</option>
-                        <option value="tag-no">Tag No.</option>
-                    </select>
+                    <input
+                        type="text"
+                        class="form-input"
+                        placeholder="search child's name"
+                        id="search-child-name"
+                    />
                     <br />
-                    <input type="text" class="form-input" />
-                    <br />
-                    <button class="button button__size button__misc">
+                    <button
+                        class="button button__size button__misc"
+                        id="search-child-button"
+                    >
                         Search
                     </button>
                 </div>
@@ -218,11 +224,7 @@
                     <div id="notify" class="notify"></div>
                     <h4>Recently added:</h4>
                     <p style="display: none" id="preload-record">
-                        <img
-                            src="./public/loader2.svg"
-                            width="20"
-                            id="img-loader"
-                        />
+                        <img src="loader2.svg" width="20" id="img-loader" />
                         Please wait ....
                     </p>
                     <div id="children-list"></div>

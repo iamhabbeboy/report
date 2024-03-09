@@ -6,7 +6,28 @@ import { IChildren } from "./types";
 const collectionName = "tcn-children";
 
 export function setupChildren() {
+  const searchBtn = document.getElementById(
+    "search-child-button",
+  ) as HTMLButtonElement;
+  const searchChildName = document.getElementById(
+    "search-child-name",
+  ) as HTMLInputElement;
+
+  searchChildName.addEventListener("keyup", async (evt: any) => {
+    if (evt.target.value === "") {
+      getAllChildren();
+    }
+  });
+  searchBtn.addEventListener("click", async () => {
+    if (searchChildName.value === "") {
+      searchChildName.focus();
+      return;
+    }
+    getAllChildrenBySearchQuery(searchChildName.value);
+  });
+
   const form = document.getElementById("capture-record") as HTMLElement;
+
   form.addEventListener("submit", async (evt) => {
     evt.preventDefault();
     const parentName = document.getElementById(
@@ -44,7 +65,7 @@ export function setupChildren() {
         months,
         years,
       },
-      name: childName.value,
+      name: childName.value.toLowerCase(),
       dob: childDob.value,
       parentName: parentName.value,
       parentPhone: parentPhone.value,
@@ -83,6 +104,42 @@ async function getAllChildren() {
   loader.style.display = "block";
   const fb = new GoogleFirestoreDatabase();
   const getAllChildren = await fb.getCollectionLimit(collectionName);
+  const childrenList = document.getElementById("children-list") as HTMLElement;
+  let result = "";
+  getAllChildren.forEach((child) => {
+    result += `<div class="children">
+        <div class="children__layout">
+          <img
+            src="${child.image}"
+            style="border-radius: 9px;width: 150px; height: 150px"
+          />
+          <div class="children__name">
+            <h3>${child.name}</h3>
+            <h3>Age: ${child.ageData.years} Years, ${child.ageData.months} Months</h3>
+            <p>Parent Name: ${child.parentName}</p>
+            <p>Parent Phone No.: ${child.parentPhone}</p>
+            ${child.homeAddress ? "<p>Address: " + child.homeAddress + "</p>" : ""}
+          </div>
+          <!--<div class="children__option">
+            <button>Check-in</button>
+            <button>Check-in</button>
+          </div>-->
+        </div>
+      </div>`;
+  });
+  childrenList.innerHTML = result;
+  loader.style.display = "none";
+}
+
+async function getAllChildrenBySearchQuery(childName: string) {
+  // const getAllChildren = await db.children.where("age").above(0).toArray();
+  const loader = document.getElementById("preload-record") as HTMLDivElement;
+  loader.style.display = "block";
+  const fb = new GoogleFirestoreDatabase();
+  const getAllChildren = await fb.getCollectionByName(
+    collectionName,
+    childName,
+  );
   const childrenList = document.getElementById("children-list") as HTMLElement;
   let result = "";
   getAllChildren.forEach((child) => {
