@@ -1,157 +1,220 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TCN Attendance Report</title>
-    <script>
-      window.onload = function () {
-        const video = document.getElementById("video");
-        const canvas = document.getElementById("canvas");
-        const snapButton = document.getElementById("snap");
-        const retryButton = document.getElementById("retry");
-        const ctx = canvas.getContext("2d");
-        const btnButton = document.getElementById("btn-record");
-        const addView = document.getElementById("add-record");
-        const recordList = document.getElementById("record-list");
-        const img = document.getElementById("preview");
-        let hasCaptured = false;
-        let hasTab = false;
-        let stream;
-        function toggleDisplay() {
-          if (addView.style.display === "block") {
-            recordList.style.display = "block";
-            addView.style.display = "none";
-            this.innerText = "Add+";
-            hasTab = false;
-          } else {
-            recordList.style.display = "none";
-            addView.style.display = "block";
-            this.innerText = "Show record";
-            hasTab = true;
-          }
-          console.log("hasTab:", hasTab, "hasCaptured", !hasCaptured)
-          if(!hasTab) {
-            video.pause();
-            stream.getTracks().forEach((track) => track.stop());
-          }
-          if (hasTab && !hasCaptured) {
-            navigator.mediaDevices
-              .getUserMedia({ video: {facingMode: 'environment'} })
-              .then(function (stm) {
-                stream = stm;
-                video.srcObject = stm;
-              })
-              .catch(function (err) {
-                console.error("Error accessing media devices.", err);
-              });
-          }
-        }
-        btnButton.addEventListener("click", toggleDisplay);
-        snapButton.addEventListener("click", takeSnapshot);
-        retry.addEventListener("click", (evt) => {
-          evt.preventDefault();
-          video.play();
-          video.style.display = "block";
-          img.src = "";
-          img.style.width = "0px";
-          img.style.height = "0px";
-          evt.target.style.display = 'none';
-          snapButton.style.display = 'block';
-          navigator.mediaDevices
-              .getUserMedia({ video: {facingMode: 'environment'} })
-              .then(function (stm) {
-                stream = stm;
-                video.srcObject = stm;
-              })
-              .catch(function (err) {
-                console.error("Error accessing media devices.", err);
-              });
-        });
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>TCN Attendance Report</title>
+        <script>
+            window.onload = function () {
+                const video = document.getElementById("video");
+                const canvas = document.getElementById("canvas");
+                const snapButton = document.getElementById("snap");
+                const retryButton = document.getElementById("retry");
+                const ctx = canvas.getContext("2d");
+                const btnButton = document.getElementById("btn-record");
+                const addView = document.getElementById("add-record");
+                const recordList = document.getElementById("record-list");
+                const img = document.getElementById("preview");
+                let hasCaptured = false;
+                let hasTab = false;
+                let stream;
+                function toggleDisplay() {
+                    if (addView.style.display === "block") {
+                        recordList.style.display = "block";
+                        addView.style.display = "none";
+                        this.innerText = "Add+";
+                        hasTab = false;
+                    } else {
+                        recordList.style.display = "none";
+                        addView.style.display = "block";
+                        this.innerText = "Show record";
+                        hasTab = true;
+                    }
+                    console.log("hasTab:", hasTab, "hasCaptured", !hasCaptured);
+                    if (!hasTab) {
+                        video.pause();
+                        stream.getTracks().forEach((track) => track.stop());
+                    }
+                    if (hasTab && !hasCaptured) {
+                        navigator.mediaDevices
+                            .getUserMedia({
+                                video: { facingMode: "environment" },
+                            })
+                            .then(function (stm) {
+                                stream = stm;
+                                video.srcObject = stm;
+                            })
+                            .catch(function (err) {
+                                console.error(
+                                    "Error accessing media devices.",
+                                    err,
+                                );
+                            });
+                    }
+                }
+                btnButton.addEventListener("click", toggleDisplay);
+                snapButton.addEventListener("click", takeSnapshot);
+                retry.addEventListener("click", (evt) => {
+                    evt.preventDefault();
+                    video.play();
+                    video.style.display = "block";
+                    img.src = "";
+                    img.style.width = "0px";
+                    img.style.height = "0px";
+                    evt.target.style.display = "none";
+                    snapButton.style.display = "block";
+                    navigator.mediaDevices
+                        .getUserMedia({ video: { facingMode: "environment" } })
+                        .then(function (stm) {
+                            stream = stm;
+                            video.srcObject = stm;
+                        })
+                        .catch(function (err) {
+                            console.error(
+                                "Error accessing media devices.",
+                                err,
+                            );
+                        });
+                });
 
-        function takeSnapshot(evt) {
-          evt.preventDefault();
-          hasCaptured = true
-          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-          const imageData = canvas.toDataURL("image/png");
-          img.src = imageData;
-          img.style.width = "300px";
-          img.style.height = "300px";
-          video.pause();
-          video.style.display = "none";
-          stream.getTracks().forEach((track) => track.stop());
-          evt.target.style.display = 'none';
-          retry.style.display = 'block';
-        }
-      };
-    </script>
-  </head>
-  <body>
-    <div class="layout">
-      <h1>Children Attendance</h1>
-      <div style="display: flex; justify-content: space-between">
-        <a href="/">&laquo; Back </a>
-        <button class="button" id="btn-record">Add+</button>
-      </div>
-      <div style="display: none" id="add-record">
-        <h4>Add Record</h4>
-        <form id="capture-record">
-          <div class="image__capture">
-            <div class="image__preview">
-              <img id="preview" />
-              <video id="video" class="video" autoplay></video>
-              <canvas
-                id="canvas"
-                width="300"
-                height="300"
-                style="display: none"
-              ></canvas>
+                function takeSnapshot(evt) {
+                    evt.preventDefault();
+                    hasCaptured = true;
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    const imageData = canvas.toDataURL("image/png");
+                    img.src = imageData;
+                    img.style.width = "300px";
+                    img.style.height = "250px";
+                    video.pause();
+                    video.style.display = "none";
+                    stream.getTracks().forEach((track) => track.stop());
+                    evt.target.style.display = "none";
+                    retry.style.display = "block";
+                }
+            };
+        </script>
+    </head>
+    <body>
+        <div class="layout">
+            <h1>Children Attendance</h1>
+            <div style="display: flex; justify-content: space-between">
+                <a href="/">&laquo; Back </a>
+                <button class="button" id="btn-record">Add+</button>
             </div>
-            <div style="display: flex; align-items: center; justify-content: center;">
-              <button class="button" id="snap">Capture</button>
-              <button class="button" id="retry" style="display:none">Try again</button>
+            <div style="display: none" id="add-record">
+                <h4>Add Record</h4>
+                <form id="capture-record">
+                    <div class="image__capture">
+                        <div class="image__preview">
+                            <img id="preview" />
+                            <video id="video" class="video" autoplay></video>
+                            <canvas
+                                id="canvas"
+                                width="300"
+                                height="300"
+                                style="display: none"
+                            ></canvas>
+                        </div>
+                        <div
+                            style="
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                            "
+                        >
+                            <button class="button" id="snap">Capture</button>
+                            <button
+                                class="button"
+                                id="retry"
+                                style="display: none"
+                            >
+                                Try again
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input
+                            type="text"
+                            class="form-input"
+                            value=""
+                            id="child-name"
+                            required
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label>Date of birth</label>
+                        <input
+                            type="date"
+                            class="form-input"
+                            value=""
+                            id="child-dob"
+                            required
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label>Parent Name</label>
+                        <input
+                            type="text"
+                            class="form-input"
+                            value=""
+                            id="parent-name"
+                            required
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label>Parent Phone</label>
+                        <input
+                            type="text"
+                            class="form-input"
+                            value=""
+                            id="parent-phone"
+                            required
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label>Home Address</label>
+                        <textarea
+                            class="form-input"
+                            id="home-address"
+                            required
+                        ></textarea>
+                    </div>
+                    <button
+                        class="button"
+                        id=""
+                        style="width: 100%"
+                        type="submit"
+                    >
+                        Submit
+                    </button>
+                </form>
+                <br />
+                <br />
             </div>
-          </div>
-          <div class="form-group">
-            <label>Name</label>
-            <input type="text" class="form-input" value="" id="child-name" required />
-          </div>
-          <div class="form-group">
-            <label>Date of birth</label>
-            <input type="date" class="form-input" value="" id="child-dob" required />
-          </div>
-          <div class="form-group">
-            <label>Parent Name</label>
-            <input type="text" class="form-input" value="" id="parent-name" required />
-          </div>
-          <div class="form-group">
-            <label>Parent Phone</label>
-            <input type="text" class="form-input" value="" id="parent-phone" required />
-          </div>
-          <button class="button" id="" style="width: 100%" type="submit">Submit</button>
-        </form>
-      </div>
-    <div id="record-list">
-      <div>
-        <h4>Search</h4>
-        <select class="form-input">
-          <option value="">Search by</option>
-          <option value="name">Name</option>
-          <option value="tag-no">Tag No.</option>
-        </select>
-        <br />
-        <input type="text" class="form-input" />
-        <br />
-        <button class="button button__size button__misc">Search</button>
-      </div>
-      <div>
-        <div id="notify" class="notify"></div>
-        <h4>Check in:</h4>
-        <div id="children-list"></div>
-      </div>
-    </div>
-    </div>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+            <div id="record-list">
+                <div>
+                    <h4>Search</h4>
+                    <select class="form-input">
+                        <option value="">Search by</option>
+                        <option value="name">Name</option>
+                        <option value="tag-no">Tag No.</option>
+                    </select>
+                    <br />
+                    <input type="text" class="form-input" />
+                    <br />
+                    <button class="button button__size button__misc">
+                        Search
+                    </button>
+                </div>
+                <div>
+                    <div id="notify" class="notify"></div>
+                    <h4>Search result:</h4>
+                    <div id="children-list"></div>
+                </div>
+            </div>
+        </div>
+        <script type="module" src="/src/main.ts"></script>
+    </body>
 </html>
