@@ -1,5 +1,5 @@
 import { getTimestamp } from "./common";
-import { db } from "./database";
+// import { db } from "./database";
 import { GoogleFirestoreDatabase } from "./firebase";
 import { IChildren } from "./types";
 
