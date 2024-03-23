@@ -111,7 +111,7 @@ async function getAllChildren() {
         <div class="children__layout">
           <img
             src="${child.image}"
-            style="border-radius: 9px;width: 150px; height: 150px"
+            style="border-radius: 9px;width: 150px; height: 200px"
           />
           <div class="children__name">
             <h3>${child.name}</h3>
